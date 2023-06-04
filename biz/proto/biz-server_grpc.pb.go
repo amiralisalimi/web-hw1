@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: grpc/biz-server.proto
+// source: proto/biz-server.proto
 
 package biz
 
@@ -137,5 +137,5 @@ var BizServer_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "grpc/biz-server.proto",
+	Metadata: "proto/biz-server.proto",
 }
