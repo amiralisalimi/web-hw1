@@ -1,5 +1,5 @@
 syntax = "proto3";
-package Authenticate;
+package auth;
 
 option go_package = "auth/";
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.6.1
-// source: auth/auth.proto
+// source: proto/auth.proto
 
 package auth
 
@@ -36,7 +36,7 @@ func NewAuthGeneratorClient(cc grpc.ClientConnInterface) AuthGeneratorClient {
 
 func (c *authGeneratorClient) ReqPq(ctx context.Context, in *PGRequest, opts ...grpc.CallOption) (*PGResponse, error) {
 	out := new(PGResponse)
-	err := c.cc.Invoke(ctx, "/Authenticate.AuthGenerator/req_pq", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.AuthGenerator/req_pq", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -45,7 +45,7 @@ func (c *authGeneratorClient) ReqPq(ctx context.Context, in *PGRequest, opts ...
 
 func (c *authGeneratorClient) Req_DHParams(ctx context.Context, in *DHParamsRequest, opts ...grpc.CallOption) (*DHParamsResponse, error) {
 	out := new(DHParamsResponse)
-	err := c.cc.Invoke(ctx, "/Authenticate.AuthGenerator/req_DH_params", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.AuthGenerator/req_DH_params", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func _AuthGenerator_ReqPq_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Authenticate.AuthGenerator/req_pq",
+		FullMethod: "/auth.AuthGenerator/req_pq",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthGeneratorServer).ReqPq(ctx, req.(*PGRequest))
@@ -112,7 +112,7 @@ func _AuthGenerator_Req_DHParams_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Authenticate.AuthGenerator/req_DH_params",
+		FullMethod: "/auth.AuthGenerator/req_DH_params",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthGeneratorServer).Req_DHParams(ctx, req.(*DHParamsRequest))
@@ -124,7 +124,7 @@ func _AuthGenerator_Req_DHParams_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var AuthGenerator_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "Authenticate.AuthGenerator",
+	ServiceName: "auth.AuthGenerator",
 	HandlerType: (*AuthGeneratorServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -137,5 +137,5 @@ var AuthGenerator_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "auth/auth.proto",
+	Metadata: "proto/auth.proto",
 }

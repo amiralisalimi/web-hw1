@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option go_package = "biz/";
+
+package biz;
+
+service biz_server {
+    rpc get_users(user_auth) returns (users_list);
+    rpc get_users_with_sql_inject(user_auth) returns (users_list);
+}
+
+message user_auth {
+    string user_id = 1;
+    int32 auth_key = 2;
+    int32 message_id = 3;
+}
+
+message users_list {
+    repeated user users = 1;
+    int32 message_id = 2;
+}
+
+message user {
+    string name = 1;
+    string family = 2;
+    int32 id = 3;
+    int32 age = 4;
+    string sex = 5;
+    string createdAt = 6;
+}

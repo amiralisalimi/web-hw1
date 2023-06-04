@@ -30,7 +30,7 @@ type Server struct {
 	auth.UnimplementedAuthGeneratorServer
 }
 
-func (s *Server) req_pq(ctx context.Context, in *auth.PGRequest) (*auth.PGResponse, error) {
+func (s *Server) ReqPq(ctx context.Context, in *auth.PGRequest) (*auth.PGResponse, error) {
 	serverNonce := nonceGen()
 	p := primeNumberGen()
 	g := rand.Intn(50)
@@ -45,7 +45,7 @@ func (s *Server) req_pq(ctx context.Context, in *auth.PGRequest) (*auth.PGRespon
 	}, nil
 }
 
-func (s *Server) req_DH_params(ctx context.Context, in *auth.DHParamsRequest) (*auth.DHParamsResponse, error) {
+func (s *Server) Req_DHParams(ctx context.Context, in *auth.DHParamsRequest) (*auth.DHParamsResponse, error) {
 	val, err := redisCli.Get(ctx, getKey(in.Nonce, in.ServerNonce)).Result()
 	if err != nil {
 		return nil, err
