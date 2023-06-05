@@ -53,6 +53,7 @@ func (b *BizServer) GetUsers(c context.Context, user *biz.UserAuth) (*biz.UsersL
 		return nil, parseErr
 	}
 	if err != nil {
+		fmt.Println(1)
 		return nil, err
 	}
 	defer usersListQuery.Close()
@@ -114,7 +115,7 @@ func NewBizServer() (*BizServer, error) {
 func main() {
 	bizServer, err := NewBizServer()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Unable to create biz server: %v", err)
 	}
 	port := flag.Int("port", 5062, "Server port")
 	flag.Parse()
