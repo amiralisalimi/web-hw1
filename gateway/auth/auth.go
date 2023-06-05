@@ -63,7 +63,7 @@ func SendDHParamsRequest(messageID int) (int, int, error) {
 		Nonce:       nonce,
 		ServerNonce: serverNonce,
 		MessageId:   uint32(messageID),
-		A:           int32(aPub),
+		A:           uint64(aPub),
 	})
 	if err != nil {
 		return 0, 0, err
@@ -77,10 +77,17 @@ func SendDHParamsRequest(messageID int) (int, int, error) {
 
 func getAPrivetAndAPub(g, p int) (int, int) {
 	x := rand.Intn(50)
-	xPub := int(uint8(math.Pow(float64(g), float64(x))) % uint8(p))
-	return x, xPub
+	xPub := 1.
+	for i := 0; i < x; i++ {
+		xPub = math.Mod(xPub*float64(g), float64(p))
+	}
+	return x, int(xPub)
 }
 
 func getKey(p, bPub, a int) int {
-	return int(uint8(p) % uint8(math.Pow(float64(bPub), float64(a))))
+	key := 1.
+	for i := 0; i < a; i++ {
+		key = math.Mod(key*float64(bPub), float64(p))
+	}
+	return int(key)
 }

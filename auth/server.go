@@ -6,7 +6,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
-	"flag"
+	"strconv"
 	"fmt"
 	"math"
 	"math/rand"
@@ -17,8 +17,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-var primes = [20]int{461, 151, 197, 79, 239, 263, 137, 127, 139, 113, 101, 277, 83, 479, 397, 233, 23, 449, 223, 251}
-
+var primes = [20]int{2, 13, 37, 53, 17, 29, 3, 41, 43, 31, 7, 5, 23, 11, 19, 83, 101, 71, 97, 223}
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 var redisCli = redis.NewClient(&redis.Options{
 	Addr:     "localhost:6379",
@@ -35,7 +34,9 @@ func (s *Server) ReqPq(ctx context.Context, in *auth.PGRequest) (*auth.PGRespons
 	serverNonce := nonceGen()
 	p := primeNumberGen()
 	g := rand.Intn(50)
-	redisCli.Set(ctx, getKey(in.Nonce, serverNonce), [2]int{p, g}, 20*time.Minute)
+
+	redisCli.Set(ctx, "p:"+getKey(in.Nonce, serverNonce), p, 20*time.Minute)
+	redisCli.Set(ctx, "g:"+getKey(in.Nonce, serverNonce), g, 20*time.Minute)
 
 	return &auth.PGResponse{
 		Nonce:       in.Nonce,
@@ -47,23 +48,32 @@ func (s *Server) ReqPq(ctx context.Context, in *auth.PGRequest) (*auth.PGRespons
 }
 
 func (s *Server) Req_DHParams(ctx context.Context, in *auth.DHParamsRequest) (*auth.DHParamsResponse, error) {
-	val, err := redisCli.Get(ctx, getKey(in.Nonce, in.ServerNonce)).Result()
+	pStr, err := redisCli.Get(ctx, "p:"+getKey(in.Nonce, in.ServerNonce)).Result()
 	if err != nil {
 		return nil, err
 	}
-	p, g := val[0], val[1]
+	gStr, err := redisCli.Get(ctx, "g:"+getKey(in.Nonce, in.ServerNonce)).Result()
+	if err != nil {
+		return nil, err
+	}
+	p, err := strconv.Atoi(pStr)
+	g, err := strconv.Atoi(gStr)
 	b := rand.Intn(50)
-	pubB := uint8(math.Pow(float64(g), float64(b))) % p
-	x := uint8(math.Pow(float64(in.A), float64(b)))
-	key := p % x
+	pubB := 1.
+	key := 1.
+	for i := 0; i < b; i++ {
+		pubB = math.Mod(pubB*float64(g), float64(p))
+		key = math.Mod(key*float64(in.A), float64(p))
+	}
 
-	redisCli.Set(ctx, "authKey:"+string(key), key, 0)
+	redisCli.Set(ctx, "authKey:"+fmt.Sprintf("%f", key), key, 0)
 	redisCli.Del(ctx, getKey(in.Nonce, in.ServerNonce))
+
 	return &auth.DHParamsResponse{
 		Nonce:       in.Nonce,
 		ServerNonce: in.ServerNonce,
 		MessageId:   in.MessageId + 1,
-		B:           int32(pubB),
+		B:           uint64(pubB),
 	}, nil
 }
 
@@ -85,9 +95,7 @@ func nonceGen() string {
 }
 
 func main() {
-	port := flag.Int("port", 5052, "Port number")
-	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	lis, err := net.Listen("tcp", ":5052")
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
 	}
@@ -96,7 +104,7 @@ func main() {
 	serv := Server{}
 
 	auth.RegisterAuthGeneratorServer(s, &serv)
-	fmt.Printf("server listening at %d\n", *port)
+	fmt.Println("server listening at 5052")
 	if err := s.Serve(lis); err != nil {
 		fmt.Printf("failed to serve: %v\n", err)
 	}
