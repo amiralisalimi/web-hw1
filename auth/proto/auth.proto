@@ -1,7 +1,6 @@
 syntax = "proto3";
-package auth;
-
-option go_package = "auth/";
+package Authenticate;
+option go_package = "/";
 
 message PGRequest {
   string nonce = 1;
@@ -20,14 +19,14 @@ message DHParamsRequest {
   string nonce = 1;
   string server_nonce = 2;
   uint32 message_id = 3;
-  int32 a = 4;
+  uint64 a = 4;
 }
 
 message DHParamsResponse {
   string nonce = 1;
   string server_nonce = 2;
   uint32 message_id = 3;
-  int32 b = 4;
+  uint64 b = 4;
 }
 
 service AuthGenerator {
