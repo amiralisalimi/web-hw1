@@ -5,9 +5,11 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net"
 	"strconv"
 
 	_ "github.com/lib/pq"
+	"google.golang.org/grpc"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -47,6 +49,7 @@ func (b *BizServer) GetUsers(c context.Context, user *biz.UserAuth) (*biz.UsersL
 		usersListQuery, err = b.db.Query("SELECT * FROM USERS ORDER BY id LIMIT 100")
 	}
 	if err != nil {
+		fmt.Println(1)
 		return nil, err
 	}
 	defer usersListQuery.Close()
@@ -106,9 +109,17 @@ func NewBizServer() (*BizServer, error) {
 }
 
 func main() {
-	bizServer, err := NewBizServer()
+	lis, err := net.Listen("tcp", ":5062")
 	if err != nil {
-		panic(err)
+		fmt.Printf("failed to listen: %v\n", err)
 	}
-	fmt.Print(bizServer.GetUsers(context.Background(), &biz.UserAuth{UserId: "0"}))
+
+	s := grpc.NewServer()
+	serv, err := NewBizServer()
+
+	biz.RegisterBizServerServer(s, serv)
+	fmt.Println("server listening at 5062")
+	if err := s.Serve(lis); err != nil {
+		fmt.Printf("failed to serve: %v\n", err)
+	}
 }
