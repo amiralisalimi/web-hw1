@@ -26,6 +26,7 @@ func getAuthKey(c *gin.Context) {
 func main() {
 	port := flag.Int("port", 6433, "Port number")
 	flag.Parse()
+	auth.Init()
 	r := gin.Default()
 	r.GET("/auth", getAuthKey)
 	r.Run(fmt.Sprintf(":%d", *port))
