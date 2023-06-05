@@ -6,11 +6,11 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
-	"strconv"
 	"fmt"
 	"math"
 	"math/rand"
 	"net"
+	"strconv"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -30,7 +30,6 @@ type Server struct {
 }
 
 func (s *Server) ReqPq(ctx context.Context, in *auth.PGRequest) (*auth.PGResponse, error) {
-	fmt.Print("HDHDHDHD")
 	serverNonce := nonceGen()
 	p := primeNumberGen()
 	g := rand.Intn(50)
