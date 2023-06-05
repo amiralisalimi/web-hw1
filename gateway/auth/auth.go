@@ -9,6 +9,7 @@ import (
 	"math/rand"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -21,6 +22,19 @@ var nonce = ""
 var serverNonce = ""
 var grpcPort = ":5052"
 
+var client auth.AuthGeneratorClient
+
+func Init() {
+	conn, err := grpc.Dial(grpcPort, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		fmt.Printf("did not connect: %v", err)
+	}
+
+	defer conn.Close()
+
+	client = auth.NewAuthGeneratorClient(conn)
+}
+
 func nonceGen() string {
 	b := make([]rune, 20)
 	for i := range b {
@@ -30,24 +44,13 @@ func nonceGen() string {
 }
 
 func SendPGRequest(messageID int) (int, error) {
-	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(grpcPort, grpc.WithInsecure())
-	if err != nil {
-		fmt.Printf("did not connect: %v", err)
-	}
-
-	defer conn.Close()
-
-	c := auth.NewAuthGeneratorClient(conn)
-
-	r, err := c.ReqPq(context.Background(), &auth.PGRequest{
+	r, err := client.ReqPq(context.Background(), &auth.PGRequest{
 		Nonce:     nonceGen(),
 		MessageId: uint32(messageID),
 	})
 	if err != nil {
 		return 0, err
 	}
-
 	p, g = int(r.P), int(r.G)
 	a, aPub = getAPrivetAndAPub(g, p)
 	nonce, serverNonce = r.Nonce, r.ServerNonce
@@ -56,17 +59,7 @@ func SendPGRequest(messageID int) (int, error) {
 }
 
 func SendDHParamsRequest(messageID int) (int, int, error) {
-	var conn *grpc.ClientConn
-	conn, err := grpc.Dial(grpcPort, grpc.WithInsecure())
-	if err != nil {
-		fmt.Printf("did not connect: %v", err)
-	}
-
-	defer conn.Close()
-
-	c := auth.NewAuthGeneratorClient(conn)
-
-	r, err := c.Req_DHParams(context.Background(), &auth.DHParamsRequest{
+	r, err := client.Req_DHParams(context.Background(), &auth.DHParamsRequest{
 		Nonce:       nonce,
 		ServerNonce: serverNonce,
 		MessageId:   uint32(messageID),

@@ -31,6 +31,7 @@ type Server struct {
 }
 
 func (s *Server) ReqPq(ctx context.Context, in *auth.PGRequest) (*auth.PGResponse, error) {
+	fmt.Print("HDHDHDHD")
 	serverNonce := nonceGen()
 	p := primeNumberGen()
 	g := rand.Intn(50)
