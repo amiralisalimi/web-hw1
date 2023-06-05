@@ -56,7 +56,13 @@ func (s *Server) Req_DHParams(ctx context.Context, in *auth.DHParamsRequest) (*a
 		return nil, err
 	}
 	p, err := strconv.Atoi(pStr)
+	if err != nil {
+		return nil, err
+	}
 	g, err := strconv.Atoi(gStr)
+	if err != nil {
+		return nil, err
+	}
 	b := rand.Intn(50)
 	pubB := 1.
 	key := 1.
@@ -65,7 +71,7 @@ func (s *Server) Req_DHParams(ctx context.Context, in *auth.DHParamsRequest) (*a
 		key = math.Mod(key*float64(in.A), float64(p))
 	}
 
-	redisCli.Set(ctx, "authKey:"+fmt.Sprintf("%f", key), key, 0)
+	redisCli.Set(ctx, "authKey:"+fmt.Sprintf("%d", int32(key)), int32(key), 0)
 	redisCli.Del(ctx, getKey(in.Nonce, in.ServerNonce))
 
 	return &auth.DHParamsResponse{

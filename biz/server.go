@@ -4,11 +4,15 @@ import (
 	biz "biz/proto"
 	"context"
 	"database/sql"
+	"flag"
 	"fmt"
+	"log"
+	"net"
 	"strconv"
 
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"google.golang.org/grpc"
 )
 
 type BizServer struct {
@@ -30,8 +34,8 @@ func (b *BizServer) getUserFromQuery(rows *sql.Rows) (*biz.User, error) {
 	return &biz.User{Name: name, Family: family, Id: id, Age: age, Sex: sex, CreatedAt: createdAt}, nil
 }
 
-func (b *BizServer) checkAuth(c context.Context, auth int32) error {
-	_, err := b.redisCli.Get(c, fmt.Sprintf("authKey:%d", auth)).Result()
+func (b *BizServer) checkAuth(c context.Context, auth string) error {
+	_, err := b.redisCli.Get(c, fmt.Sprintf("authKey:%s", auth)).Result()
 	return err
 }
 
@@ -41,10 +45,12 @@ func (b *BizServer) GetUsers(c context.Context, user *biz.UserAuth) (*biz.UsersL
 		return nil, err
 	}
 	var usersListQuery *sql.Rows
-	if id, parseErr := strconv.ParseInt(user.UserId, 10, 64); parseErr != nil && id != 0 {
-		usersListQuery, err = b.db.Query(fmt.Sprintf("SELECT * FROM USERS WHERE id=%s", user.UserId))
-	} else {
+	if id, parseErr := strconv.Atoi(user.UserId); parseErr == nil && id != 0 {
+		usersListQuery, err = b.db.Query("SELECT * FROM USERS WHERE id=?", user.UserId)
+	} else if parseErr == nil {
 		usersListQuery, err = b.db.Query("SELECT * FROM USERS ORDER BY id LIMIT 100")
+	} else {
+		return nil, parseErr
 	}
 	if err != nil {
 		return nil, err
@@ -110,5 +116,14 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Print(bizServer.GetUsers(context.Background(), &biz.UserAuth{UserId: "0"}))
+	port := flag.Int("port", 5062, "Server port")
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	grpcServer := grpc.NewServer()
+	biz.RegisterBizServerServer(grpcServer, bizServer)
+	fmt.Printf("Biz Server listening on port: %d\n", *port)
+	grpcServer.Serve(lis)
 }
