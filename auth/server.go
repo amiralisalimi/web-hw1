@@ -20,7 +20,7 @@ import (
 var primes = [20]int{2, 13, 37, 53, 17, 29, 3, 41, 43, 31, 7, 5, 23, 11, 19, 83, 101, 71, 97, 223}
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 var redisCli = redis.NewClient(&redis.Options{
-	Addr:     "localhost:6379",
+	Addr:     ":6379",
 	Password: "",
 	DB:       0,
 })

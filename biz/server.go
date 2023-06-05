@@ -95,10 +95,10 @@ func (b *BizServer) GetUsersWithSqlInject(c context.Context, user *biz.UserAuth)
 }
 
 func NewBizServer() (*BizServer, error) {
-	connStr := "postgres://postgres:postgres@localhost/web-hw1?sslmode=disable"
+	connStr := "postgres://postgres:postgres@db/web_hw1?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	redisCli := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
+		Addr:     ":6379",
 		Password: "",
 		DB:       0,
 	})
@@ -119,7 +119,7 @@ func main() {
 	}
 	port := flag.Int("port", 5062, "Server port")
 	flag.Parse()
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}

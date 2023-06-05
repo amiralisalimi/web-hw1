@@ -12,4 +12,4 @@ RUN go build auth/*.go
 
 EXPOSE $PORT
 
-ENTRYPOINT [ "/go/src/auth/server.go", "-port=$PORT" ]
+ENTRYPOINT [ "/go/src/auth/server", "-port=$PORT" ]

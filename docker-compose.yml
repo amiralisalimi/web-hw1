@@ -7,7 +7,68 @@ services:
     volumes:
       - ./nginx:/etc/nginx/conf.d
       - ./ssl:/etc/nginx/ssl
+    networks:
+      - backend
+    depends_on:
+      - gateway
+  auth:
+    image: golang:1.16-alpine
+    build: ./auth
+    expose:
+      - "5052"
+    networks:
+      - backend
+    depends_on:
+      - redis
+    command:
+      tail -f /dev/null
+  biz:
+    image: golang:1.16-alpine
+    build: ./biz
+    expose:
+      - "5062"
+    networks:
+      - backend
+    depends_on:
+      - redis
+      - db
+    command:
+      tail -f /dev/null
+  gateway:
+    image: golang:1.16-alpine
+    build: ./gateway
+    expose:
+      - "6433"
+    networks:
+      - backend
+    depends_on:
+      - auth
+      - biz
+    command:
+      tail -f /dev/null
   redis:
     image: redis
-    ports:
-     - "6379:6379"
+    expose:
+      - "6379"
+    networks:
+      - backend
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=web-hw1
+    expose:
+      - "5432"
+    networks:
+      - backend
+    volumes:
+      - ./db:/var/lib/postgresql/data
+
+volumes:
+  db:
+
+networks:
+  backend:
+    name: backend-network
