@@ -46,14 +46,14 @@ func (b *BizServer) GetUsers(c context.Context, user *biz.UserAuth) (*biz.UsersL
 	}
 	var usersListQuery *sql.Rows
 	if id, parseErr := strconv.Atoi(user.UserId); parseErr == nil && id != 0 {
-		usersListQuery, err = b.db.Query("SELECT * FROM USERS WHERE id=?", user.UserId)
+		usersListQuery, err = b.db.Query("SELECT * FROM USERS WHERE id = $1", id)
 	} else if parseErr == nil {
 		usersListQuery, err = b.db.Query("SELECT * FROM USERS ORDER BY id LIMIT 100")
 	} else {
 		return nil, parseErr
 	}
 	if err != nil {
-		fmt.Println(1)
+		fmt.Println(err)
 		return nil, err
 	}
 	defer usersListQuery.Close()
