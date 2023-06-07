@@ -46,7 +46,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=web-hw1
+      - POSTGRES_DB=postgres
     healthcheck:
       test: /usr/bin/pg_isready -U postgres
       interval: 5s
