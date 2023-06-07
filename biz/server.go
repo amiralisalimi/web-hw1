@@ -95,10 +95,10 @@ func (b *BizServer) GetUsersWithSqlInject(c context.Context, user *biz.UserAuth)
 }
 
 func NewBizServer() (*BizServer, error) {
-	connStr := "postgres://postgres:postgres@db/web_hw1?sslmode=disable"
+	connStr := "postgres://postgres:postgres@db/postgres?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	redisCli := redis.NewClient(&redis.Options{
-		Addr:     ":6379",
+		Addr:     "redis:6379",
 		Password: "",
 		DB:       0,
 	})

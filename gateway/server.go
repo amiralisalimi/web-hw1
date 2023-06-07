@@ -2,7 +2,7 @@ package main
 
 import (
 	auth "gateway/auth"
-	"gateway/biz"
+	biz "gateway/biz"
 
 	"flag"
 	"fmt"

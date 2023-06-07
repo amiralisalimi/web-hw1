@@ -1,15 +1,12 @@
-FROM golang:1.16-alpine
+FROM golang:latest
 
-ENV GIN_MODE=release
 ENV PORT=6433
 
-WORKDIR /go/src/gateway
-
+WORKDIR /go/src/gateway/
 COPY . /go/src/gateway/
 
-RUN go mod download github.com/bsm/ginkgo/v2
-RUN go build gateway/*.go
+RUN go build /go/src/gateway/server.go
 
 EXPOSE $PORT
 
-ENTRYPOINT [ "/go/src/gateway/server", "-port=$PORT" ]
+ENTRYPOINT [ "/go/src/gateway/server" ]

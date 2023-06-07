@@ -6,6 +6,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
+	"flag"
 	"fmt"
 	"math"
 	"math/rand"
@@ -20,7 +21,7 @@ import (
 var primes = [20]int{2, 13, 37, 53, 17, 29, 3, 41, 43, 31, 7, 5, 23, 11, 19, 83, 101, 71, 97, 223}
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 var redisCli = redis.NewClient(&redis.Options{
-	Addr:     ":6379",
+	Addr:     "redis:6379",
 	Password: "",
 	DB:       0,
 })
@@ -100,7 +101,9 @@ func nonceGen() string {
 }
 
 func main() {
-	lis, err := net.Listen("tcp", ":5052")
+	port := flag.Int("port", 5052, "Server port")
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%v", *port))
 	if err != nil {
 		fmt.Printf("failed to listen: %v\n", err)
 	}
@@ -109,7 +112,7 @@ func main() {
 	serv := Server{}
 
 	auth.RegisterAuthGeneratorServer(s, &serv)
-	fmt.Println("server listening at 5052")
+	fmt.Printf("server listening at %v\n", *port)
 	if err := s.Serve(lis); err != nil {
 		fmt.Printf("failed to serve: %v\n", err)
 	}

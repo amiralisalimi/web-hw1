@@ -1,0 +1,12 @@
+BEGIN;
+
+CREATE TABLE USERS (
+    name VARCHAR(100),
+    family VARCHAR(100),
+    id INT PRIMARY KEY,
+    age INT,
+    sex VARCHAR(6),
+    createdAt TIMESTAMP WITH TIME ZONE
+);
+
+COMMIT;

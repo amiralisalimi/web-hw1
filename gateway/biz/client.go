@@ -1,7 +1,8 @@
 package biz
 
 import (
-	biz "biz/proto"
+	biz "gateway/biz/proto"
+
 	"context"
 	"fmt"
 
@@ -9,7 +10,7 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-var grpcPort = ":5062"
+var grpcPort = "biz:5062"
 
 var conn *grpc.ClientConn
 var client biz.BizServerClient

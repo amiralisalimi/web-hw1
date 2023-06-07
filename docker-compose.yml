@@ -1,3 +1,4 @@
+version: '2'
 services:
   web:
     image: nginx
@@ -5,14 +6,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx:/etc/nginx/conf.d
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - ./ssl:/etc/nginx/ssl
     networks:
       - backend
-    depends_on:
-      - gateway
   auth:
-    image: golang:1.16-alpine
     build: ./auth
     expose:
       - "5052"
@@ -20,32 +19,21 @@ services:
       - backend
     depends_on:
       - redis
-    command:
-      tail -f /dev/null
   biz:
-    image: golang:1.16-alpine
     build: ./biz
     expose:
       - "5062"
     networks:
       - backend
     depends_on:
-      - redis
-      - db
-    command:
-      tail -f /dev/null
+      db:
+        condition: service_healthy
   gateway:
-    image: golang:1.16-alpine
     build: ./gateway
     expose:
       - "6433"
     networks:
       - backend
-    depends_on:
-      - auth
-      - biz
-    command:
-      tail -f /dev/null
   redis:
     image: redis
     expose:
@@ -59,11 +47,17 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=web-hw1
+    healthcheck:
+      test: /usr/bin/pg_isready -U postgres
+      interval: 5s
+      timeout: 10s
+      retries: 120
     expose:
       - "5432"
     networks:
       - backend
     volumes:
+      - ./sql/web_hw1.sql:/docker-entrypoint-initdb.d/web_hw1.sql
       - ./db:/var/lib/postgresql/data
 
 volumes:

@@ -1,7 +1,7 @@
 package auth
 
 import (
-	auth "auth/proto"
+	auth "gateway/auth/proto"
 
 	"context"
 	"fmt"
@@ -20,7 +20,7 @@ var p = 0
 var g = 0
 var nonce = ""
 var serverNonce = ""
-var grpcPort = ":5052"
+var grpcPort = "auth:5052"
 
 var conn *grpc.ClientConn
 var client auth.AuthGeneratorClient
