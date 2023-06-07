@@ -1,3 +1,15 @@
+/*
+Auth API:
+	version: 1.0.0
+	title: Auth API
+Schemes: grpc
+Host: auth:5052
+BasePath: /
+Produces:
+	- application/json
+
+swagger:meta
+*/
 package main
 
 import (

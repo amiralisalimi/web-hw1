@@ -1,3 +1,20 @@
+/*
+BizAPI:
+	version: 1.0.0
+	title: BizAPI
+Schemes: grpc
+Host: biz:5062
+BasePath: /
+Produces:
+	- application/json
+
+securityDefinitions:
+	authKey:
+		type: authKey
+		in: data
+		name: authorization
+swagger:meta
+*/
 package main
 
 import (

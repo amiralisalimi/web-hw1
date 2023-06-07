@@ -1,3 +1,20 @@
+/*
+Gateway API:
+	version: 1.0.0
+	title: Gateway API
+Schemes: http, https
+Host: gateway:6433
+BasePath: /
+Produces:
+	- application/json
+
+securityDefinitions:
+	authKey:
+		type: authKey
+		in: data
+		name: authorization
+swagger:meta
+*/
 package main
 
 import (

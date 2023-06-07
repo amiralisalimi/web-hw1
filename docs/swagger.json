@@ -1,0 +1,16 @@
+{
+  "consumes": [
+    "application/json",
+    "Products:",
+    "application/json"
+  ],
+  "swagger": "2.0",
+  "info": {
+    "description": "Schemes:\nhttp\nhttps",
+    "title": "Documentation of Biz Server API",
+    "version": "1.0.0"
+  },
+  "host": "biz",
+  "basePath": "/",
+  "paths": {}
+}
