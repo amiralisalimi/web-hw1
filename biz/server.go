@@ -26,6 +26,7 @@ import (
 	"log"
 	"net"
 	"strconv"
+	"errors"
 
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
@@ -53,7 +54,10 @@ func (b *BizServer) getUserFromQuery(rows *sql.Rows) (*biz.User, error) {
 
 func (b *BizServer) checkAuth(c context.Context, auth string) error {
 	_, err := b.redisCli.Get(c, fmt.Sprintf("authKey:%s", auth)).Result()
-	return err
+	if err != nil {
+		return errors.New("Authentication Unsuccessful");
+	}
+	return nil
 }
 
 func (b *BizServer) GetUsers(c context.Context, user *biz.UserAuth) (*biz.UsersList, error) {
